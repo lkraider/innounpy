@@ -1,10 +1,13 @@
 import pefile
+import pylzma
 import struct
 from collections import OrderedDict
 from pprint import pprint
 
 # magic numbers
 SetupLdrOffsetTableResID = 11111
+SetupIDSize = 64
+Setup0LZMAOffset = 13
 
 # configurable
 filename = 'setup_tyrian_2000.exe'
@@ -31,3 +34,28 @@ TSetupLdrOffsetTable = OrderedDict(zip(keys, values))
 print('TSetupLdrOffsetTable:')
 pprint(TSetupLdrOffsetTable.items())
 
+# read SetupHeader from setup-0.bin
+f = open(filename)
+f.seek(TSetupLdrOffsetTable['Offset0'])
+
+TSetupID = f.read(SetupIDSize)
+print 'TSetupID:', TSetupID
+
+# dump setup-0.bin
+f.seek(TSetupLdrOffsetTable['Offset0'] + SetupIDSize)
+o = open('setup-0.bin', 'wb')
+buffer_size = 1024
+data = f.read(buffer_size)
+while data:
+    o.write(data)
+    data = f.read(buffer_size)
+
+# decompress setup-0.bin data
+f.seek(TSetupLdrOffsetTable['Offset0'] + SetupIDSize + Setup0LZMAOffset)
+decompress = pylzma.decompressobj()
+o = open('setup-0.unpacked', 'wb')
+data = f.read(1)
+while data:
+    o.write(decompress.decompress(data, 1))
+    data = f.read(1)
+o.write(decompress.flush())
