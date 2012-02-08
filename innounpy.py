@@ -128,35 +128,36 @@ class InnoUnpacker(object):
     def TSetupHeader(self):
         """Table from setup-0 that packs Inno Setup installer options"""
         # read setup-0 data
-        SetupHeaderStrings = 26
+        SetupHeaderStrings = 29
         with self.setup_0_data as f:
             strings = []
             for i in range(SetupHeaderStrings):
                 string_length = struct.unpack('<l', f.read(4))[0]
-                print string_length
-                if (string_length == 0):
-                    strings.append('')
-                    continue
-                strings.append(f.read(string_length))
+                if self.debug and string_length > 512:
+                    # skip long data strings in debug mode
+                    value = 'BIGSTRING OFFSET:%s LENGTH:%s' % (f.tell(), string_length)
+                    f.seek(string_length, 1)
+                else:
+                    value = f.read(string_length)
+                strings.append(value)
         keys = ['AppName', 'AppVerName', 'AppId', 'AppCopyright', 'AppPublisher', 'AppPublisherURL',
                 'AppSupportPhone', 'AppSupportURL', 'AppUpdatesURL', 'AppVersion', 'DefaultDirName',
-                'DefaultGroupName', 'BaseFilename', 'UninstallFilesDir', 'UninstallDisplayName',
-                'UninstallDisplayIcon', 'AppMutex', 'DefaultUserInfoName', 'DefaultUserInfoOrg',
-                'DefaultUserInfoSerial', 'AppReadmeFile', 'AppContact', 'AppComments',
-                'AppModifyPath', 'CreateUninstallRegKey', 'Uninstallable']
+                'DefaultGroupName', 'BaseFilename', 'LicenseText',
+                'InfoBeforeText', 'InfoAfterText', 'UninstallFilesDir', 'UninstallDisplayName',
+                'UninstallDisplayIcon', 'AppMutex', 'DefaultUserInfoName',
+                'DefaultUserInfoOrg', 'DefaultUserInfoSerial', 'CompiledCodeText',
+                'AppReadmeFile', 'AppContact', 'AppComments', 'AppModifyPath',
+                'SignedUninstallerSignature']
         return OrderedDict(zip(keys, strings))
 
     def run(self):
         print('TSetupID: %s' % self.TSetupID)
         print('TSetupLdrOffsetTable:')
         pprint(self.TSetupLdrOffsetTable.items())
-
         if self.debug:
             self._dump_setup_0()
-
         print('TCompressedBlockHeader:')
         pprint(self.TCompressedBlockHeader.items())
-
         print('TSetupHeader:')
         pprint(self.TSetupHeader)
 
