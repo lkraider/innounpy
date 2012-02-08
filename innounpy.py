@@ -3,73 +3,177 @@ import pylzma
 import struct
 from collections import OrderedDict
 from pprint import pprint
+from functools import wraps 
 
-# magic numbers
-SetupLdrOffsetTableResID = 11111
-SetupIDSize = 64
-CRCCompressedBlockHeaderSize = 9
-DecompressBuffer = 4096
-DecompressCRCSize = 4
 
-# configurable
-filename = 'setup_tyrian_2000.exe'
+def cached_property(func, name=None):
+    """
+    cached_property(func, name=None) -> a descriptor
+    This decorator implements an object's property which is computed
+    the first time it is accessed, and which value is then stored in
+    the object's __dict__ for later use. If the attribute is deleted,
+    the value will be recomputed the next time it is accessed.
+    Usage:
+        class X(object):
+            @cachedProperty
+            def foo(self):
+                return computation()
+    """
+    if name is None:
+        name = func.__name__
 
-# parse executable resources to find TSetupLdrOffsetTable offset
-pe = pefile.PE(filename, fast_load=True)
-pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_RESOURCE']])
+    @wraps(func)
+    def _get(self):
+        try:
+            value = self.__dict__[name]
+        except KeyError:
+            value = func(self)
+            self.__dict__[name] = value
+        return value
 
-rt_rcdata_index = [entry.id for entry in pe.DIRECTORY_ENTRY_RESOURCE.entries].index(pefile.RESOURCE_TYPE['RT_RCDATA'])
-rt_rcdata_directory = pe.DIRECTORY_ENTRY_RESOURCE.entries[rt_rcdata_index]
-resource = [entry for entry in rt_rcdata_directory.directory.entries if entry.id == SetupLdrOffsetTableResID][0]
-resource = resource.directory.entries[0]
+    def _del(self):
+        self.__dict__.pop(name, None)
 
-data_rva = resource.data.struct.OffsetToData
-size = resource.data.struct.Size
-TSetupLdrOffsetTableData = pe.get_memory_mapped_image()[data_rva:data_rva+size]
-pe.close()
+    return property(_get, None, _del)
 
-# extract TSetupLdrOffsetTable fields
-keys = ['ID', 'Version', 'TotalSize', 'OffsetEXE', 'UncompressedSizeEXE', 'CRCEXE', 'Offset0', 'Offset1', 'TableCRC']
-values = struct.unpack('<12s8L', TSetupLdrOffsetTableData)
-TSetupLdrOffsetTable = OrderedDict(zip(keys, values))
 
-print('TSetupLdrOffsetTable:')
-pprint(TSetupLdrOffsetTable.items())
+class InnoUnpacker(object):
 
-# read SetupHeader from setup-0.bin
-f = open(filename)
-f.seek(TSetupLdrOffsetTable['Offset0'])
+    def __init__(self, filename, debug=False):
+        """Initialize the Inno Setup Unpacker with the executable file to unpack"""
+        self.filename = filename
+        self.debug = debug
+        # table sizes
+        self.SetupIDSize = 64
+        self.CRCCompressedBlockHeaderSize = 9
+        # output files
+        self.setup_0_filename = 'setup-0.unpacked'
 
-TSetupID = f.read(SetupIDSize)
-print 'TSetupID:', TSetupID
+    @cached_property
+    def TSetupLdrOffsetTable(self):
+        """Table that contains the setup-0 and setup-1 compressed data offsets inside the binary"""
+        # resource id magic number
+        SetupLdrOffsetTableResID = 11111
 
-# dump setup-0.bin
-f.seek(TSetupLdrOffsetTable['Offset0'] + SetupIDSize)
-o = open('setup-0.bin', 'wb')
-buffer_size = 1024
-data = f.read(buffer_size)
-while data:
-    o.write(data)
-    data = f.read(buffer_size)
+        # parse executable resources to find TSetupLdrOffsetTable structure offset
+        pe = pefile.PE(self.filename, fast_load=True)
+        pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_RESOURCE']])
 
-# extract Compress HdrCRC + TCompressedBlockHeader
-f.seek(TSetupLdrOffsetTable['Offset0'] + SetupIDSize)
-CRCCompressedBlockHeaderData = f.read(CRCCompressedBlockHeaderSize)
+        rt_rcdata_type = pefile.RESOURCE_TYPE['RT_RCDATA']
+        rt_rcdata_directory = [entry for entry in pe.DIRECTORY_ENTRY_RESOURCE.entries if entry.id == rt_rcdata_type][0]
+        resource = [entry for entry in rt_rcdata_directory.directory.entries if entry.id == SetupLdrOffsetTableResID][0]
+        resource = resource.directory.entries[0]
 
-keys = ['HdrCRC', 'StoredSize', 'Compressed']
-values = struct.unpack('<lL?', CRCCompressedBlockHeaderData)
-TCompressedBlockHeader = OrderedDict(zip(keys, values))
-print('TCompressedBlockHeader:')
-pprint(TCompressedBlockHeader.items())
+        data_rva = resource.data.struct.OffsetToData
+        size = resource.data.struct.Size
+        TSetupLdrOffsetTableData = pe.get_memory_mapped_image()[data_rva:data_rva+size]
+        pe.close()
 
-# decompress setup-0.bin data
-decompress = pylzma.decompressobj()
-o = open('setup-0.unpacked', 'wb')
-read_count = 0
-while read_count < TCompressedBlockHeader['StoredSize']:
-    crc = f.read(DecompressCRCSize)
-    data = f.read(DecompressBuffer)
-    #assert(zlib.crc32(data) == struct.unpack('<l', crc)[0])
-    o.write(decompress.decompress(data, DecompressBuffer))
-    read_count += len(crc) + len(data)
-o.write(decompress.flush())
+        # extract TSetupLdrOffsetTable fields
+        keys = ['ID', 'Version', 'TotalSize', 'OffsetEXE', 'UncompressedSizeEXE', 'CRCEXE', 'Offset0', 'Offset1', 'TableCRC']
+        values = struct.unpack('<12s8L', TSetupLdrOffsetTableData)
+        return OrderedDict(zip(keys, values))
+
+    @cached_property
+    def TSetupID(self):
+        """String of the Inno Setup version used to generate the installer"""
+        # read SetupHeader from setup-0.bin
+        with open(self.filename) as f:
+            f.seek(self.TSetupLdrOffsetTable['Offset0'])
+            TSetupID = f.read(self.SetupIDSize)
+        return TSetupID
+
+    @cached_property
+    def TCompressedBlockHeader(self):
+        """Table that cointains the size of the compressed data"""
+        # extract Compress HdrCRC + TCompressedBlockHeader
+        with open(self.filename) as f:
+            f.seek(self.TSetupLdrOffsetTable['Offset0'] + self.SetupIDSize)
+            CRCCompressedBlockHeaderData = f.read(self.CRCCompressedBlockHeaderSize)
+
+        keys = ['HdrCRC', 'StoredSize', 'Compressed']
+        values = struct.unpack('<lL?', CRCCompressedBlockHeaderData)
+        return OrderedDict(zip(keys, values))
+
+    @cached_property
+    def setup_0_extracted(self):
+        """Decompress setup-0 data to disk"""
+        # decompress setup-0.bin data
+        DecompressBuffer = 4096
+        DecompressCRCSize = 4
+
+        f = open(self.filename, 'rb')
+        f.seek(self.TSetupLdrOffsetTable['Offset0'] + self.SetupIDSize + self.CRCCompressedBlockHeaderSize)
+
+        decompress = pylzma.decompressobj()
+        with open(self.setup_0_filename, 'wb') as o:
+            read_count = 0
+            while read_count < self.TCompressedBlockHeader['StoredSize']:
+                crc = f.read(DecompressCRCSize)
+                data = f.read(DecompressBuffer)
+                #assert(zlib.crc32(data) == struct.unpack('<l', crc)[0])
+                o.write(decompress.decompress(data, DecompressBuffer))
+                read_count += len(crc) + len(data)
+            o.write(decompress.flush())
+
+        f.close()
+        return True
+
+    @property
+    def setup_0_data(self):
+        if self.setup_0_extracted:
+            return open(self.setup_0_filename, 'rb')
+
+    @cached_property
+    def TSetupHeader(self):
+        """Table from setup-0 that packs Inno Setup installer options"""
+        # read setup-0 data
+        SetupHeaderStrings = 26
+        with self.setup_0_data as f:
+            strings = []
+            for i in range(SetupHeaderStrings):
+                string_length = struct.unpack('<l', f.read(4))[0]
+                print string_length
+                if (string_length == 0):
+                    strings.append('')
+                    continue
+                strings.append(f.read(string_length))
+        keys = ['AppName', 'AppVerName', 'AppId', 'AppCopyright', 'AppPublisher', 'AppPublisherURL',
+                'AppSupportPhone', 'AppSupportURL', 'AppUpdatesURL', 'AppVersion', 'DefaultDirName',
+                'DefaultGroupName', 'BaseFilename', 'UninstallFilesDir', 'UninstallDisplayName',
+                'UninstallDisplayIcon', 'AppMutex', 'DefaultUserInfoName', 'DefaultUserInfoOrg',
+                'DefaultUserInfoSerial', 'AppReadmeFile', 'AppContact', 'AppComments',
+                'AppModifyPath', 'CreateUninstallRegKey', 'Uninstallable']
+        return OrderedDict(zip(keys, strings))
+
+    def run(self):
+        print('TSetupID: %s' % self.TSetupID)
+        print('TSetupLdrOffsetTable:')
+        pprint(self.TSetupLdrOffsetTable.items())
+
+        if self.debug:
+            self._dump_setup_0()
+
+        print('TCompressedBlockHeader:')
+        pprint(self.TCompressedBlockHeader.items())
+
+        print('TSetupHeader:')
+        pprint(self.TSetupHeader)
+
+    # Debug functions
+    def _dump_setup_0(self, output='setup-0.bin'):
+        """Dump compressed setup-0 data to disk"""
+        f = open(self.filename, 'rb')
+        f.seek(self.TSetupLdrOffsetTable['Offset0'])
+        with open(output, 'wb') as o:
+            buffer_size = 1024
+            data = f.read(buffer_size)
+            while data:
+                o.write(data)
+                data = f.read(buffer_size)
+        f.close()
+
+
+if __name__ == '__main__':
+    unpacker = InnoUnpacker('setup_tyrian_2000.exe', debug=True)
+    unpacker.run()
