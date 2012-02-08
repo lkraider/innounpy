@@ -3,7 +3,9 @@ import pylzma
 import struct
 from collections import OrderedDict
 from pprint import pprint
-from functools import wraps 
+from functools import wraps
+
+import struct_parser
 
 
 def cached_property(func, name=None):
@@ -48,6 +50,13 @@ class InnoUnpacker(object):
         self.CRCCompressedBlockHeaderSize = 9
         # output files
         self.setup_0_filename = 'setup-0.unpacked'
+
+    @cached_property
+    def struct_constants(self):
+        """Dictionary of parsed data from matching version Struct.pas file"""
+        version = self.TSetupID.split('(')[-1].split(')')[0]
+        parser = struct_parser.parser_for_version(version)
+        return dict(parser)
 
     @cached_property
     def TSetupLdrOffsetTable(self):
@@ -128,7 +137,7 @@ class InnoUnpacker(object):
     def TSetupHeader(self):
         """Table from setup-0 that packs Inno Setup installer options"""
         # read setup-0 data
-        SetupHeaderStrings = 29
+        SetupHeaderStrings = self.struct_constants['SetupHeaderStrings']
         with self.setup_0_data as f:
             strings = []
             for i in range(SetupHeaderStrings):
@@ -140,14 +149,7 @@ class InnoUnpacker(object):
                 else:
                     value = f.read(string_length)
                 strings.append(value)
-        keys = ['AppName', 'AppVerName', 'AppId', 'AppCopyright', 'AppPublisher', 'AppPublisherURL',
-                'AppSupportPhone', 'AppSupportURL', 'AppUpdatesURL', 'AppVersion', 'DefaultDirName',
-                'DefaultGroupName', 'BaseFilename', 'LicenseText',
-                'InfoBeforeText', 'InfoAfterText', 'UninstallFilesDir', 'UninstallDisplayName',
-                'UninstallDisplayIcon', 'AppMutex', 'DefaultUserInfoName',
-                'DefaultUserInfoOrg', 'DefaultUserInfoSerial', 'CompiledCodeText',
-                'AppReadmeFile', 'AppContact', 'AppComments', 'AppModifyPath',
-                'SignedUninstallerSignature']
+        keys = self.struct_constants['TSetupHeader_Strings']
         return OrderedDict(zip(keys, strings))
 
     def run(self):
