@@ -7,7 +7,9 @@ from pprint import pprint
 # magic numbers
 SetupLdrOffsetTableResID = 11111
 SetupIDSize = 64
-Setup0LZMAOffset = 13
+CRCCompressedBlockHeaderSize = 9
+DecompressBuffer = 4096
+DecompressCRCSize = 4
 
 # configurable
 filename = 'setup_tyrian_2000.exe'
@@ -50,12 +52,24 @@ while data:
     o.write(data)
     data = f.read(buffer_size)
 
+# extract Compress HdrCRC + TCompressedBlockHeader
+f.seek(TSetupLdrOffsetTable['Offset0'] + SetupIDSize)
+CRCCompressedBlockHeaderData = f.read(CRCCompressedBlockHeaderSize)
+
+keys = ['HdrCRC', 'StoredSize', 'Compressed']
+values = struct.unpack('<lL?', CRCCompressedBlockHeaderData)
+TCompressedBlockHeader = OrderedDict(zip(keys, values))
+print('TCompressedBlockHeader:')
+pprint(TCompressedBlockHeader.items())
+
 # decompress setup-0.bin data
-f.seek(TSetupLdrOffsetTable['Offset0'] + SetupIDSize + Setup0LZMAOffset)
 decompress = pylzma.decompressobj()
 o = open('setup-0.unpacked', 'wb')
-data = f.read(1)
-while data:
-    o.write(decompress.decompress(data, 1))
-    data = f.read(1)
+read_count = 0
+while read_count < TCompressedBlockHeader['StoredSize']:
+    crc = f.read(DecompressCRCSize)
+    data = f.read(DecompressBuffer)
+    #assert(zlib.crc32(data) == struct.unpack('<l', crc)[0])
+    o.write(decompress.decompress(data, DecompressBuffer))
+    read_count += len(crc) + len(data)
 o.write(decompress.flush())
