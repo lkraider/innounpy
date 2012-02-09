@@ -20,13 +20,18 @@ class StructParser(object):
         self._vars['TSetupID'] = self._find_data('SetupID: TSetupID = \'', '\'')
         self._vars['SetupHeaderStrings'] = int(self._find_data('SetupHeaderStrings = ', ';'))
 
-        TSetupHeader = self._find_data('TSetupHeader = packed record', ':')
-        self._vars['TSetupHeader_Strings'] = [string.strip() for string in TSetupHeader.split(',')]
+        TSetupHeader_StringsList = self._find_data('TSetupHeader = packed record', ':')
+        self._vars['TSetupHeader_StringsList'] = [string.strip() for string in TSetupHeader_StringsList.split(',')]
+
+        TSetupHeader_IntegersList = self._find_data('NumLanguageEntries, ', ':', keep_start=True)
+        self._vars['TSetupHeader_IntegersList'] = [integer.strip() for integer in TSetupHeader_IntegersList.split(',')]
 
         self._data = None
 
-    def _find_data(self, match, end_match):
-        start = self.raw_data.index(match) + len(match)
+    def _find_data(self, match, end_match, keep_start=False):
+        start = self.raw_data.index(match)
+        if not keep_start:
+            start += len(match)
         return self.raw_data[start:self.raw_data.find(end_match, start)].strip()
 
     def __getattr__(self, key):

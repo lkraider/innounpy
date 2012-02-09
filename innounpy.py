@@ -1,3 +1,4 @@
+import os
 import pefile
 import pylzma
 import struct
@@ -130,27 +131,45 @@ class InnoUnpacker(object):
 
     @property
     def setup_0_data(self):
+        """File object to the uncompressed setup-0 data"""
         if self.setup_0_extracted:
             return open(self.setup_0_filename, 'rb')
 
     @cached_property
     def TSetupHeader(self):
         """Table from setup-0 that packs Inno Setup installer options"""
+        TSetupHeader = OrderedDict()
+        LeadBytesSize = 32
+
         # read setup-0 data
         SetupHeaderStrings = self.struct_constants['SetupHeaderStrings']
         with self.setup_0_data as f:
-            strings = []
+            # read variable length strings
+            values = []
             for i in range(SetupHeaderStrings):
                 string_length = struct.unpack('<l', f.read(4))[0]
                 if self.debug and string_length > 512:
                     # skip long data strings in debug mode
                     value = 'BIGSTRING OFFSET:%s LENGTH:%s' % (f.tell(), string_length)
-                    f.seek(string_length, 1)
+                    f.seek(string_length, os.SEEK_CUR)
                 else:
                     value = f.read(string_length)
-                strings.append(value)
-        keys = self.struct_constants['TSetupHeader_Strings']
-        return OrderedDict(zip(keys, strings))
+                values.append(value)
+            keys = self.struct_constants['TSetupHeader_StringsList']
+            TSetupHeader.update(zip(keys, values))
+
+            # skip LeadBytes
+            f.seek(LeadBytesSize, os.SEEK_CUR)
+
+            # read packed integers
+            values = []
+            for i in range(16):
+                value = struct.unpack('<l', f.read(4))[0]
+                values.append(value)
+            keys = self.struct_constants['TSetupHeader_IntegersList']
+            TSetupHeader.update(zip(keys, values))
+
+        return TSetupHeader
 
     def run(self):
         print('TSetupID: %s' % self.TSetupID)
@@ -161,7 +180,7 @@ class InnoUnpacker(object):
         print('TCompressedBlockHeader:')
         pprint(self.TCompressedBlockHeader.items())
         print('TSetupHeader:')
-        pprint(self.TSetupHeader)
+        pprint(self.TSetupHeader.items())
 
     # Debug functions
     def _dump_setup_0(self, output='setup-0.bin'):
