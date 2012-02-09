@@ -26,6 +26,9 @@ class StructParser(object):
         TSetupHeader_IntegersList = self._find_data('NumLanguageEntries, ', ':', keep_start=True)
         self._vars['TSetupHeader_IntegersList'] = [integer.strip() for integer in TSetupHeader_IntegersList.split(',')]
 
+        TSetupHeaderOption = self._find_data('TSetupHeaderOption = (', ')')
+        self._vars['TSetupHeaderOption'] = [option.strip() for option in TSetupHeaderOption.split(',')]
+
         self._data = None
 
     def _find_data(self, match, end_match, keep_start=False):

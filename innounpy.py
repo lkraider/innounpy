@@ -140,6 +140,13 @@ class InnoUnpacker(object):
         """Table from setup-0 that packs Inno Setup installer options"""
         TSetupHeader = OrderedDict()
         LeadBytesSize = 32
+        TSetupVersionDataSize = 10
+        TMD5DigestSize = 16
+        TSetupSaltSize = 8
+        # Set size is calculated as such:
+        # (Max div 8) - (Min div 8) + 1
+        # Min is usually 0, and Max the number of elements
+        OptionsSetSize = (len(self.struct_constants['TSetupHeaderOption']) / 8) + 1
 
         # read setup-0 data
         SetupHeaderStrings = self.struct_constants['SetupHeaderStrings']
@@ -168,6 +175,30 @@ class InnoUnpacker(object):
                 values.append(value)
             keys = self.struct_constants['TSetupHeader_IntegersList']
             TSetupHeader.update(zip(keys, values))
+
+            # skip MinVersion, OnlyBelowVersion
+            f.seek(TSetupVersionDataSize * 2, os.SEEK_CUR)
+            # skip BackColor, BackColor2, WizardImageBackColor
+            f.seek(4 * 3, os.SEEK_CUR)
+            # skip PasswordHash, PasswordSalt
+            f.seek(TMD5DigestSize + TSetupSaltSize, os.SEEK_CUR)
+            # skip ExtraDiskSpaceRequired, SlicesPerDisk
+            f.seek(8 + 4, os.SEEK_CUR)
+
+            # skip sets UninstallLogMode, DirExistsWarning, PrivilegesRequired
+            f.seek(3 * 1, os.SEEK_CUR)
+            # skip sets ShowLanguageDialog, LanguageDetectionMethod, CompressMethod
+            f.seek(3 * 1, os.SEEK_CUR)
+            # skip sets ArchitecturesAllowed, ArchitecturesInstallIn64BitMode
+            f.seek(2 * 1, os.SEEK_CUR)
+
+            # skip SignedUninstallerOrigSize, SignedUninstallerHdrChecksum
+            f.seek(2 * 4, os.SEEK_CUR)
+            # skip Options Set
+            f.seek(OptionsSetSize, os.SEEK_CUR)
+
+            # store end of TSetupHeader location as its size
+            TSetupHeader['Size'] = f.tell()
 
         return TSetupHeader
 
