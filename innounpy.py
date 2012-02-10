@@ -187,8 +187,8 @@ class InnoUnpacker(object):
             # skip Options Set
             f.seek(OptionsSetSize, os.SEEK_CUR)
 
-            # store end of TSetupHeader location as its size
-            TSetupHeader['Size'] = f.tell()
+            # store end of TSetupHeader location as its size and offset
+            TSetupHeader['EndOffset'] = TSetupHeader['Size'] = f.tell()
 
         return TSetupHeader
 
@@ -217,9 +217,34 @@ class InnoUnpacker(object):
                 # store TSetupLanguageEntry indexed by language name
                 SetupLanguageEntries[TSetupLanguageEntry['Name']] = TSetupLanguageEntry
 
-            SetupLanguageEntries['Size'] = f.tell() - self.TSetupHeader['Size']
+            SetupLanguageEntries['EndOffset'] = f.tell()
+            SetupLanguageEntries['Size'] = SetupLanguageEntries['EndOffset'] - self.TSetupHeader['Size']
         return SetupLanguageEntries
 
+    @cached_property
+    def CustomMessagesEntries(self):
+        """List of custom messages"""
+        CustomMessagesEntries = OrderedDict()
+
+        with self.setup_0_data as f:
+            f.seek(self.SetupLanguageEntries['EndOffset'])
+
+            for i in range(self.TSetupHeader['NumCustomMessageEntries']):
+                TSetupCustomMessageEntry = OrderedDict()
+                TSetupCustomMessageEntry['Start'] = f.tell()
+
+                keys = self.struct_constants['TSetupCustomMessageEntry_StringsList']
+                values = self._read_strings(f, keys)
+                TSetupCustomMessageEntry.update(zip(keys, values))
+
+                TSetupCustomMessageEntry['LangIndex'] = struct.unpack('<l', f.read(4))[0]
+
+                TSetupCustomMessageEntry['Size'] = f.tell() - TSetupCustomMessageEntry['Start']
+                CustomMessagesEntries[TSetupCustomMessageEntry['Name']] = TSetupCustomMessageEntry
+
+            CustomMessagesEntries['EndOffset'] = f.tell()
+            CustomMessagesEntries['Size'] = CustomMessagesEntries['EndOffset'] - self.SetupLanguageEntries['EndOffset']
+        return CustomMessagesEntries
 
     def run(self):
         print('TSetupID: %s' % self.TSetupID)
@@ -233,7 +258,8 @@ class InnoUnpacker(object):
         pprint(self.TSetupHeader.items())
         print('SetupLanguageEntries:')
         pprint(self.SetupLanguageEntries.items())
-
+        print('CustomMessagesEntries:')
+        pprint(self.CustomMessagesEntries.items())
 
     # Helper functions
     def _read_strings(self, fileobj, keys):

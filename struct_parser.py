@@ -35,6 +35,11 @@ class StructParser(object):
         self._vars['TSetupLanguageEntry_StringsList'] = [string.strip() for string in TSetupLanguageEntry_StringsList.split(',')]
         assert(len(self.TSetupLanguageEntry_StringsList) == self.SetupLanguageEntryStrings)
 
+        self._vars['SetupCustomMessageEntryStrings'] = int(self._find_data('SetupCustomMessageEntryStrings = ', ';'))
+        TSetupCustomMessageEntry_StringsList = self._find_data('TSetupCustomMessageEntry = packed record', ':')
+        self._vars['TSetupCustomMessageEntry_StringsList'] = [string.strip() for string in TSetupCustomMessageEntry_StringsList.split(',')]
+        assert(len(self.TSetupCustomMessageEntry_StringsList) == self.SetupCustomMessageEntryStrings)
+
         self._data = None
 
     def _find_data(self, match, end_match, keep_start=False):
