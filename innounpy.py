@@ -149,31 +149,21 @@ class InnoUnpacker(object):
         OptionsSetSize = (len(self.struct_constants['TSetupHeaderOption']) / 8) + 1
 
         # read setup-0 data
-        SetupHeaderStrings = self.struct_constants['SetupHeaderStrings']
         with self.setup_0_data as f:
             # read variable length strings
-            values = []
-            for i in range(SetupHeaderStrings):
-                string_length = struct.unpack('<l', f.read(4))[0]
-                if self.debug and string_length > 512:
-                    # skip long data strings in debug mode
-                    value = 'BIGSTRING OFFSET:%s LENGTH:%s' % (f.tell(), string_length)
-                    f.seek(string_length, os.SEEK_CUR)
-                else:
-                    value = f.read(string_length)
-                values.append(value)
             keys = self.struct_constants['TSetupHeader_StringsList']
+            values = self._read_strings(f, keys)
             TSetupHeader.update(zip(keys, values))
 
             # skip LeadBytes
             f.seek(LeadBytesSize, os.SEEK_CUR)
 
             # read packed integers
+            keys = self.struct_constants['TSetupHeader_IntegersList']
             values = []
-            for i in range(16):
+            for i in range(len(keys)):
                 value = struct.unpack('<l', f.read(4))[0]
                 values.append(value)
-            keys = self.struct_constants['TSetupHeader_IntegersList']
             TSetupHeader.update(zip(keys, values))
 
             # skip MinVersion, OnlyBelowVersion
@@ -202,6 +192,35 @@ class InnoUnpacker(object):
 
         return TSetupHeader
 
+    @cached_property
+    def SetupLanguageEntries(self):
+        """List of language entries"""
+        SetupLanguageEntries = OrderedDict()
+
+        with self.setup_0_data as f:
+            f.seek(self.TSetupHeader['Size'])
+
+            # read all language entries
+            for i in range(self.TSetupHeader['NumLanguageEntries']):
+                TSetupLanguageEntry = OrderedDict()
+                TSetupLanguageEntry['Start'] = f.tell()
+
+                # read variable length strings
+                keys = self.struct_constants['TSetupLanguageEntry_StringsList']
+                values = self._read_strings(f, keys)
+                TSetupLanguageEntry.update(zip(keys, values))
+
+                # skip integer values and boolean
+                f.seek(6 * 4 + 1, os.SEEK_CUR)
+
+                TSetupLanguageEntry['Size'] = f.tell() - TSetupLanguageEntry['Start']
+                # store TSetupLanguageEntry indexed by language name
+                SetupLanguageEntries[TSetupLanguageEntry['Name']] = TSetupLanguageEntry
+
+            SetupLanguageEntries['Size'] = f.tell() - self.TSetupHeader['Size']
+        return SetupLanguageEntries
+
+
     def run(self):
         print('TSetupID: %s' % self.TSetupID)
         print('TSetupLdrOffsetTable:')
@@ -212,6 +231,25 @@ class InnoUnpacker(object):
         pprint(self.TCompressedBlockHeader.items())
         print('TSetupHeader:')
         pprint(self.TSetupHeader.items())
+        print('SetupLanguageEntries:')
+        pprint(self.SetupLanguageEntries.items())
+
+
+    # Helper functions
+    def _read_strings(self, fileobj, keys):
+        """Read len(keys) number of strings from fileobj's current position"""
+        f = fileobj
+        values = []
+        for i in range(len(keys)):
+            string_length = struct.unpack('<l', f.read(4))[0]
+            if self.debug and string_length > 512:
+                # skip long data strings in debug mode
+                value = 'BIGSTRING OFFSET:%s LENGTH:%s' % (f.tell(), string_length)
+                f.seek(string_length, os.SEEK_CUR)
+            else:
+                value = f.read(string_length)
+            values.append(value)
+        return values
 
     # Debug functions
     def _dump_setup_0(self, output='setup-0.bin'):

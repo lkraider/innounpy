@@ -18,16 +18,22 @@ class StructParser(object):
         """Collect all relevant variables from file"""
 
         self._vars['TSetupID'] = self._find_data('SetupID: TSetupID = \'', '\'')
-        self._vars['SetupHeaderStrings'] = int(self._find_data('SetupHeaderStrings = ', ';'))
 
+        self._vars['SetupHeaderStrings'] = int(self._find_data('SetupHeaderStrings = ', ';'))
         TSetupHeader_StringsList = self._find_data('TSetupHeader = packed record', ':')
         self._vars['TSetupHeader_StringsList'] = [string.strip() for string in TSetupHeader_StringsList.split(',')]
+        assert(len(self.TSetupHeader_StringsList) == self.SetupHeaderStrings)
 
         TSetupHeader_IntegersList = self._find_data('NumLanguageEntries, ', ':', keep_start=True)
         self._vars['TSetupHeader_IntegersList'] = [integer.strip() for integer in TSetupHeader_IntegersList.split(',')]
 
         TSetupHeaderOption = self._find_data('TSetupHeaderOption = (', ')')
         self._vars['TSetupHeaderOption'] = [option.strip() for option in TSetupHeaderOption.split(',')]
+
+        self._vars['SetupLanguageEntryStrings'] = int(self._find_data('SetupLanguageEntryStrings = ', ';'))
+        TSetupLanguageEntry_StringsList = self._find_data('Name, LanguageName, ', ':', keep_start=True)
+        self._vars['TSetupLanguageEntry_StringsList'] = [string.strip() for string in TSetupLanguageEntry_StringsList.split(',')]
+        assert(len(self.TSetupLanguageEntry_StringsList) == self.SetupLanguageEntryStrings)
 
         self._data = None
 
