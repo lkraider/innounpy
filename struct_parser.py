@@ -57,8 +57,43 @@ def parse(fileinput_files, trace=False):
     return pyPEG.parse(unit(), fileinput_files, skipWS=True, skipComments=comment)
 
 
+def pyast_to_dict(ast):
+    from collections import OrderedDict
+    ast_dict = OrderedDict()
+
+    def add_or_append(d, key, val):
+        if key in d:
+            if type(d[key]) == list:
+                d[key].append(val)
+            else:
+                d[key] = [d[key], val]
+        else:
+            d[key] = val
+
+    def todict(l, d):
+        if type(l) == list:
+            for i in l:
+                todict(i, d)
+        elif type(l) == pyPEG.Symbol:
+            key = l.__name__
+            if isinstance(l.what, basestring):
+                add_or_append(d, key, l.what)
+            else:
+                nd = OrderedDict()
+                add_or_append(d, key, nd)
+                todict(l.what, d=nd)
+
+    todict(ast, ast_dict)
+    return ast_dict
+
+
+def pyast_to_json(ast):
+    import json
+    return json.dumps(pyast_to_dict(ast))
+
+
 if __name__ == '__main__':
     import fileinput
     files = fileinput.input()
     result = parse(files)
-    print result
+    print pyast_to_json(result)
