@@ -47,7 +47,7 @@ def int_num():              return re.compile(r'\d+')
 def real_num():             return re.compile(r'd+(\.\d*)?([eE]([+-])?d+)?')
 def hex_num():              return re.compile(r'\$[a-fA-F\d]+')
 def asm_hex_num():          return re.compile(r'[a-fA-F\d]+[hH]?')
-def quoted_string():        return re.compile(r"'.*?'")
+def quoted_string():        return re.compile(r"'[^'\n]*'")
 def control_string():       return re.compile(r'(\#\d+)|(\#\$[a-fA-F\d]+)')
 def comment():              return re.compile(r'{.*?}', re.S)
 
