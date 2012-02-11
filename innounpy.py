@@ -6,7 +6,7 @@ from collections import OrderedDict
 from pprint import pprint
 from functools import wraps
 
-import struct_parser
+import definitions
 
 
 def cached_property(func, name=None):
@@ -56,7 +56,7 @@ class InnoUnpacker(object):
     def struct_constants(self):
         """Dictionary of parsed data from matching version Struct.pas file"""
         version = self.TSetupID.split('(')[-1].split(')')[0]
-        parser = struct_parser.parser_for_version(version)
+        parser = definitions.parser_for_version(version)
         return dict(parser)
 
     @cached_property
