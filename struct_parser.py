@@ -104,7 +104,7 @@ class StructFormatter(object):
         'byte': 1, 'boolean': 1, 'shortint': 1,
         'smallint': 2, 'word': 2,
         'integer': 4, 'cardinal': 4, 'longint': 4, 'longword': 4, 'dword': 4,
-        'int64': 8, 'qword': 8,
+        'integer64': 8, 'qword': 8,
         # real types
         'real': 4, 'single': 4,
         'double': 8, 'extended': 10,
@@ -129,16 +129,8 @@ class StructFormatter(object):
         return 1
 
     def _set_type(self, set_dict):
-        if 'type_id' in set_dict:
-            type_id = set_dict['type_id']
-            subtype = self._output.get(type_id, {}).get('type')
-            subtype = subtype if subtype else type_id
-            size = self._output.get(type_id, {}).get('size')
-            size = size if size else self.type_sizes[type_id]
-        else:
-            t = self._format_types(set_dict)
-            subtype = t
-            size = t['size']
+        subtype = self._format_types(set_dict)
+        size = subtype['size']
         size = (size / 8) + 1
         return subtype, size
 
@@ -156,7 +148,7 @@ class StructFormatter(object):
                 for n in name:
                     fields[n] = t
                     try:
-                        size + t['size'] if not isinstance(t['size'], list) else t['size'][0]
+                        size += t['size'] if not isinstance(t['size'], list) else t['size'][0]
                     except Exception:
                         print 'field size error', n, t['size']
         return fields, size
@@ -166,8 +158,24 @@ class StructFormatter(object):
         t = {}
         # type formatters
         if 'type_id' in td:
-            t['type'] = td['type_id'].lower()
-            t['size'] = self.type_sizes.get(t['type'])
+            type_id = td['type_id']
+            type_data = self._output.get(type_id)
+            if type_data is None:
+                type_name = type_id.lower()
+            else:
+                type_name = type_data['type']
+            size = self._output.get(td['type_id'], {}).get('size')
+            if size is None:
+                size = self.type_sizes.get(type_id.lower())
+                type_name = type_id if size is None else type_name
+            t['type'] = type_name
+            t['size'] = size
+            subtype = type_data.get('subtype') if type_data else None
+            fields = type_data.get('fields') if type_data else None
+            if subtype is not None:
+                t['subtype'] = subtype
+            if fields is not None:
+                t['fields'] = fields
         if 'array_type' in td:
             t['type'] = u'array'
             t['subtype'], t['size'] = self._array_type(td['array_type'])
