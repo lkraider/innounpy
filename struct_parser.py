@@ -1,6 +1,8 @@
 import re
+import json
 import pyPEG
 from pyPEG import keyword
+from collections import OrderedDict
 
 
 # A simplified pascal unit grammar, specialized in parsing Inno Setup Struct.pas files
@@ -58,7 +60,6 @@ def parse(fileinput_files, trace=False):
 
 
 def pyast_to_dict(ast):
-    from collections import OrderedDict
     ast_dict = OrderedDict()
 
     def add_or_append(d, key, val):
@@ -88,12 +89,119 @@ def pyast_to_dict(ast):
 
 
 def pyast_to_json(ast):
-    import json
     return json.dumps(pyast_to_dict(ast))
+
+
+class StructFormatter(object):
+
+    def __init__(self, pyast_dict):
+        self.pyast_dict = pyast_dict
+        self._output = {}
+
+    # size definitions
+    type_sizes = {
+        # integer types
+        'byte': 1, 'boolean': 1, 'shortint': 1,
+        'smallint': 2, 'word': 2,
+        'integer': 4, 'cardinal': 4, 'longint': 4, 'longword': 4, 'dword': 4,
+        'int64': 8, 'qword': 8,
+        # real types
+        'real': 4, 'single': 4,
+        'double': 8, 'extended': 10,
+        # string types
+        'char': 1, 'widechar': 2,
+        'string': [4, 1], # has an integer header that stores its length
+        'ansistring': [4, 1], 'widestring': [4, 2],
+    }
+
+    def _array_type(self, array_dict):
+        size = 0
+        if len(array_dict['array_index']['expression']) > 1:
+            i0 = int(array_dict['array_index']['expression'][0]['int_num'])
+            i1 = int(array_dict['array_index']['expression'][1]['int_num'])
+            size = i1 - i0 + 1
+        subtype = array_dict['array_subtype']['type_id'].lower()
+        return subtype, size * self.type_sizes.get(subtype, subtype)
+
+    def _enum_type(self, enum_dict):
+        if isinstance(enum_dict['identifier'], list):
+            return len(enum_dict['identifier'])
+        return 1
+
+    def _set_type(self, set_dict):
+        if 'type_id' in set_dict:
+            type_id = set_dict['type_id']
+            subtype = self._output.get(type_id, {}).get('type')
+            subtype = subtype if subtype else type_id
+            size = self._output.get(type_id, {}).get('size')
+            size = size if size else self.type_sizes[type_id]
+        else:
+            t = self._format_types(set_dict)
+            subtype = t
+            size = t['size']
+        size = (size / 8) + 1
+        return subtype, size
+
+    def _record_type(self, record_dict):
+        if isinstance(record_dict['record_field'], dict):
+            record_dict['record_field'] = [record_dict['record_field']]
+        size = 0
+        fields = OrderedDict()
+        for field in record_dict['record_field']:
+            name = field['identifier']
+            t = self._format_types(field)
+            if t:
+                if not isinstance(name, list):
+                    name = [name]
+                for n in name:
+                    fields[n] = t
+                    try:
+                        size + t['size'] if not isinstance(t['size'], list) else t['size'][0]
+                    except Exception:
+                        print 'field size error', n, t['size']
+        return fields, size
+
+    def _format_types(self, type_dict):
+        td = type_dict
+        t = {}
+        # type formatters
+        if 'type_id' in td:
+            t['type'] = td['type_id'].lower()
+            t['size'] = self.type_sizes.get(t['type'])
+        if 'array_type' in td:
+            t['type'] = u'array'
+            t['subtype'], t['size'] = self._array_type(td['array_type'])
+        elif 'enum_type' in td:
+            t['type'] = u'enum'
+            t['size'] = self._enum_type(td['enum_type'])
+        elif 'set_type' in td:
+            t['type'] = u'set'
+            t['subtype'], t['size'] = self._set_type(td['set_type'])
+        elif 'record_decl' in td:
+            t['type'] = u'record'
+            t['fields'], t['size'] = self._record_type(td['record_decl'])
+        elif 'pointer_type' in td:
+            pass # ignore pointer types
+        return t
+
+    def format(self):
+        for ts in self.pyast_dict['unit_interface']['type_section']:
+            if isinstance(ts['type_declaration'], dict):
+                continue
+            for td in ts['type_declaration']:
+                name = td['identifier']
+                t = self._format_types(td)
+                if t:
+                    self._output[name] = t
+        unit_dict = {self.pyast_dict['unit_head']['identifier']: self._output}
+        return unit_dict
 
 
 if __name__ == '__main__':
     import fileinput
+    from pprint import pprint
     files = fileinput.input()
     result = parse(files)
-    print pyast_to_json(result)
+    pyast_dict = pyast_to_dict(result)
+    s = StructFormatter(pyast_dict)
+    print json.dumps(s.format())
