@@ -132,7 +132,7 @@ class StructFormatter(object):
     }
 
     def _array_type(self, array_dict):
-        """Return (subtype_dict, size, count) of array"""
+        """Return (subtype_dict, count, size) of array"""
         index = array_dict['array_index']
         if 'identifier' in index:
             indextype_id = index['identifier']
@@ -156,7 +156,7 @@ class StructFormatter(object):
             subtype = subtype_id.lower()
         # ignore string size since it is variable
         size = (count * subtype_size) if not isinstance(subtype_size, list) else None
-        return subtype, size, count
+        return subtype, count, size
 
     def _enum_type(self, enum_dict):
         """Return (count, size) of enum"""
@@ -207,7 +207,7 @@ class StructFormatter(object):
                 t['type'] = type_id if not t['size'] else type_id.lower()
         elif 'array_type' in td:
             t['type'] = u'array'
-            t['subtype'], t['size'], t['count'] = self._array_type(td['array_type'])
+            t['subtype'], t['count'], t['size'] = self._array_type(td['array_type'])
         elif 'enum_type' in td:
             t['type'] = u'enum'
             t['count'], t['size'] = self._enum_type(td['enum_type'])
