@@ -93,6 +93,12 @@ def pyast_to_json(ast):
 
 
 class StructFormatter(object):
+    """
+    Format pyAST to easily parseable dictionary collection.
+
+    Note: for structures that contain strings interpret its size as
+    minimum size, not actual, since strings are variable in length.
+    """
 
     def __init__(self, pyast_dict):
         self.pyast_dict = pyast_dict
@@ -114,15 +120,38 @@ class StructFormatter(object):
         'ansistring': [4, 1], 'widestring': [4, 2],
     }
 
+    type_values = {
+        'boolean': 2,
+        'byte': 256, 'char': 256,
+        'word': 65536,
+    }
+
     def _array_type(self, array_dict):
-        """Return (subtype_string, size) of array"""
-        size = 0
-        if len(array_dict['array_index']['expression']) > 1:
-            i0 = int(array_dict['array_index']['expression'][0]['int_num'])
-            i1 = int(array_dict['array_index']['expression'][1]['int_num'])
-            size = i1 - i0 + 1
-        subtype = array_dict['array_subtype']['type_id'].lower()
-        return subtype, size * self.type_sizes.get(subtype, subtype)
+        """Return (subtype_dict, size, count) of array"""
+        index = array_dict['array_index']
+        if 'identifier' in index:
+            indextype_id = index['identifier']
+            type_data = self._output.get(indextype_id)
+            if type_data:
+                count = type_data.get('count') or self.type_values.get(type_data['type'])
+            else:
+                count = self.type_values[indextype_id.lower()]
+        elif 'expression' in index:
+            assert(len(index['expression']) > 1)
+            i0 = int(index['expression'][0]['int_num'])
+            i1 = int(index['expression'][1]['int_num'])
+            count = i1 - i0 + 1
+        subtype_data = self._format_types(array_dict['array_subtype'])
+        if subtype_data:
+            subtype = subtype_data
+            subtype_size = subtype_data['size']
+        else:
+            subtype_id = array_dict['array_subtype']['type_id']
+            subtype_size = self.type_sizes[subtype_id.lower()]
+            subtype = subtype_id.lower()
+        # we are ignoring string size for now since it is variable
+        size = (count * subtype_size) if not isinstance(subtype_size, list) else None
+        return subtype, size, count
 
     def _enum_type(self, enum_dict):
         """Return (count, size) of enum"""
@@ -135,7 +164,7 @@ class StructFormatter(object):
     def _set_type(self, set_dict):
         """Return (subtype_dict, size) of set"""
         subtype = self._format_types(set_dict)
-        size = subtype.get('count') or 255 # max set size for any type of 1byte
+        size = subtype.get('count') or self.type_values.get(subtype['type']) - 1
         size = (size / 8) + 1
         return subtype, size
 
@@ -160,9 +189,9 @@ class StructFormatter(object):
         return fields, size
 
     def _format_types(self, type_dict):
+        """Type declaration formatter"""
         td = type_dict
         t = {}
-        # type formatters
         if 'type_id' in td:
             type_id = td['type_id']
             type_data = self._output.get(type_id)
@@ -173,7 +202,7 @@ class StructFormatter(object):
                 t['type'] = type_id if not t['size'] else type_id.lower()
         elif 'array_type' in td:
             t['type'] = u'array'
-            t['subtype'], t['size'] = self._array_type(td['array_type'])
+            t['subtype'], t['size'], t['count'] = self._array_type(td['array_type'])
         elif 'enum_type' in td:
             t['type'] = u'enum'
             t['count'], t['size'] = self._enum_type(td['enum_type'])
@@ -185,9 +214,29 @@ class StructFormatter(object):
             t['fields'], t['size'] = self._record_type(td['record_decl'])
         elif 'pointer_type' in td:
             pass # ignore pointer types
-        else:
-            print 'unrecognized type', td
         return t
+
+    def _format_values(self, const_expression):
+        """Const declaration formatter"""
+        e = const_expression
+        v = None
+        if isinstance(e, list):
+            v = []
+            for item in e:
+                v.append(self._format_values(item))
+        elif 'int_num' in e:
+            v = int(e['int_num'])
+        elif 'hex_num' in e:
+            v = e['hex_num']
+        elif 'quoted_string' in e or 'control_string' in e:
+            v = ''
+            for k,s in e.items():
+                if not isinstance(s, list):
+                    s = [s]
+                unquote = (lambda s: s[1:-1]) if k == 'quoted_string' else (lambda s: s)
+                v += str.join('', map(unquote, s))
+        return v
+
 
     def format(self):
         for ts in self.pyast_dict['unit_interface']['type_section']:
@@ -199,7 +248,13 @@ class StructFormatter(object):
                 if t:
                     self._output[name] = t
         for cs in self.pyast_dict['unit_interface']['const_section']:
-            pass
+            if isinstance(cs['const_declaration'], dict):
+                cs['const_declaration'] = [cs['const_declaration']]
+            for cd in cs['const_declaration']:
+                name = cd['identifier']
+                c = self._format_types(cd)
+                c['value'] = self._format_values(cd['expression'])
+                self._output[name] = c
         unit_dict = {self.pyast_dict['unit_head']['identifier']: self._output}
         return unit_dict
 
