@@ -1,4 +1,5 @@
 import re
+import sys
 import json
 import pyPEG
 from pyPEG import keyword
@@ -88,8 +89,12 @@ def pyast_to_dict(ast):
     return ast_dict
 
 
-def pyast_to_json(ast):
-    return json.dumps(pyast_to_dict(ast))
+def pyast_to_json(ast, raw_dump=False):
+    pyast_dict = pyast_to_dict(ast)
+    if raw_dump:
+        return json.dumps(pyast_dict)
+    formatter = StructFormatter(pyast_dict)
+    return json.dumps(formatter.format())
 
 
 class StructFormatter(object):
@@ -149,7 +154,7 @@ class StructFormatter(object):
             subtype_id = array_dict['array_subtype']['type_id']
             subtype_size = self.type_sizes[subtype_id.lower()]
             subtype = subtype_id.lower()
-        # we are ignoring string size for now since it is variable
+        # ignore string size since it is variable
         size = (count * subtype_size) if not isinstance(subtype_size, list) else None
         return subtype, size, count
 
@@ -185,7 +190,7 @@ class StructFormatter(object):
                     try:
                         size += t['size'] if not isinstance(t['size'], list) else t['size'][0]
                     except Exception:
-                        print 'field size error', n, t['size']
+                        sys.stderr.write('could not calculate field size for type: %s\n' % n)
         return fields, size
 
     def _format_types(self, type_dict):
@@ -214,6 +219,10 @@ class StructFormatter(object):
             t['fields'], t['size'] = self._record_type(td['record_decl'])
         elif 'pointer_type' in td:
             pass # ignore pointer types
+        elif 'expression' in td:
+            pass # ignore const declarations
+        else:
+            sys.stderr.write('could not format type: %s\n' % type_dict)
         return t
 
     def _format_values(self, const_expression):
@@ -235,6 +244,8 @@ class StructFormatter(object):
                     s = [s]
                 unquote = (lambda s: s[1:-1]) if k == 'quoted_string' else (lambda s: s)
                 v += str.join('', map(unquote, s))
+        else:
+            sys.stderr.write('could not format const: %s\n' % const_expression)
         return v
 
 
@@ -261,9 +272,6 @@ class StructFormatter(object):
 
 if __name__ == '__main__':
     import fileinput
-    from pprint import pprint
     files = fileinput.input()
     result = parse(files)
-    pyast_dict = pyast_to_dict(result)
-    s = StructFormatter(pyast_dict)
-    print json.dumps(s.format())
+    print pyast_to_json(result)
