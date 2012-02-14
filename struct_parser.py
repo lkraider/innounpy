@@ -115,6 +115,7 @@ class StructFormatter(object):
     }
 
     def _array_type(self, array_dict):
+        """Return (subtype_string, size) of array"""
         size = 0
         if len(array_dict['array_index']['expression']) > 1:
             i0 = int(array_dict['array_index']['expression'][0]['int_num'])
@@ -124,17 +125,22 @@ class StructFormatter(object):
         return subtype, size * self.type_sizes.get(subtype, subtype)
 
     def _enum_type(self, enum_dict):
+        """Return (count, size) of enum"""
         if isinstance(enum_dict['identifier'], list):
-            return len(enum_dict['identifier'])
-        return 1
+            count = len(enum_dict['identifier'])
+            size = 1 if count < 256 else 2
+            return count, size
+        return 1, 1
 
     def _set_type(self, set_dict):
+        """Return (subtype_dict, size) of set"""
         subtype = self._format_types(set_dict)
-        size = subtype['size']
+        size = subtype.get('count') or 255 # max set size for any type of 1byte
         size = (size / 8) + 1
         return subtype, size
 
     def _record_type(self, record_dict):
+        """Return (fields_list, size) of record"""
         if isinstance(record_dict['record_field'], dict):
             record_dict['record_field'] = [record_dict['record_field']]
         size = 0
@@ -160,28 +166,17 @@ class StructFormatter(object):
         if 'type_id' in td:
             type_id = td['type_id']
             type_data = self._output.get(type_id)
-            if type_data is None:
-                type_name = type_id.lower()
+            if type_data:
+                t = type_data
             else:
-                type_name = type_data['type']
-            size = self._output.get(td['type_id'], {}).get('size')
-            if size is None:
-                size = self.type_sizes.get(type_id.lower())
-                type_name = type_id if size is None else type_name
-            t['type'] = type_name
-            t['size'] = size
-            subtype = type_data.get('subtype') if type_data else None
-            fields = type_data.get('fields') if type_data else None
-            if subtype is not None:
-                t['subtype'] = subtype
-            if fields is not None:
-                t['fields'] = fields
-        if 'array_type' in td:
+                t['size'] = self.type_sizes.get(type_id.lower())
+                t['type'] = type_id if not t['size'] else type_id.lower()
+        elif 'array_type' in td:
             t['type'] = u'array'
             t['subtype'], t['size'] = self._array_type(td['array_type'])
         elif 'enum_type' in td:
             t['type'] = u'enum'
-            t['size'] = self._enum_type(td['enum_type'])
+            t['count'], t['size'] = self._enum_type(td['enum_type'])
         elif 'set_type' in td:
             t['type'] = u'set'
             t['subtype'], t['size'] = self._set_type(td['set_type'])
@@ -190,17 +185,21 @@ class StructFormatter(object):
             t['fields'], t['size'] = self._record_type(td['record_decl'])
         elif 'pointer_type' in td:
             pass # ignore pointer types
+        else:
+            print 'unrecognized type', td
         return t
 
     def format(self):
         for ts in self.pyast_dict['unit_interface']['type_section']:
             if isinstance(ts['type_declaration'], dict):
-                continue
+                ts['type_declaration'] = [ts['type_declaration']]
             for td in ts['type_declaration']:
                 name = td['identifier']
                 t = self._format_types(td)
                 if t:
                     self._output[name] = t
+        for cs in self.pyast_dict['unit_interface']['const_section']:
+            pass
         unit_dict = {self.pyast_dict['unit_head']['identifier']: self._output}
         return unit_dict
 
