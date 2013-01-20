@@ -1,0 +1,2393 @@
+{
+    "Struct5500": {
+        "SetupTypeEntryStrings": {
+            "value": 4
+        },
+        "TSetupHeaderOption": {
+            "count": 47,
+            "type": "enum",
+            "size": 1
+        },
+        "SetupExeModeOffset": {
+            "value": "$30"
+        },
+        "TSetupLanguageDetectionMethod": {
+            "count": 3,
+            "type": "enum",
+            "size": 1
+        },
+        "TSetupTypeEntry": {
+            "fields": {
+                "Name": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Description": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 1,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                },
+                "Typ": {
+                    "count": 4,
+                    "type": "enum",
+                    "size": 1
+                },
+                "Size": {
+                    "type": "integer64",
+                    "size": 8
+                }
+            },
+            "type": "record",
+            "size": 46
+        },
+        "TMessagesLangOptionsID": {
+            "count": 8,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "!mlo!001",
+            "size": 8
+        },
+        "SetupFileEntryStrings": {
+            "value": 10
+        },
+        "TSetupPermissionEntry": {
+            "fields": {
+                "Permissions": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                }
+            },
+            "type": "record",
+            "size": 4
+        },
+        "TSetupProcessorArchitecture": {
+            "count": 4,
+            "type": "enum",
+            "size": 1
+        },
+        "SetupRegistryEntryStrings": {
+            "value": 9
+        },
+        "SetupIconEntryAnsiStrings": {
+            "value": 0
+        },
+        "ZLIBID": {
+            "count": 4,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "zlb#26",
+            "size": 4
+        },
+        "SetupBinVersion": {
+            "value": 84213760
+        },
+        "SetupProcessorArchitectureNames": {
+            "count": 4,
+            "subtype": {
+                "type": "string",
+                "size": [
+                    4,
+                    1
+                ]
+            },
+            "type": "array",
+            "value": [
+                "Unknown",
+                "x86",
+                "x64",
+                "Itanium"
+            ],
+            "size": null
+        },
+        "SetupTaskEntryStrings": {
+            "value": 6
+        },
+        "SetupIniEntryStrings": {
+            "value": 10
+        },
+        "SetupDirEntryAnsiStrings": {
+            "value": 0
+        },
+        "TUninstallerMsgTail": {
+            "fields": {
+                "ID": {
+                    "type": "longint",
+                    "size": 4
+                },
+                "Offset": {
+                    "type": "longint",
+                    "size": 4
+                }
+            },
+            "type": "record",
+            "size": 8
+        },
+        "TSetupHeader": {
+            "fields": {
+                "AppName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppVerName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppId": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppCopyright": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppPublisher": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppPublisherURL": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppSupportPhone": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppSupportURL": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppUpdatesURL": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppVersion": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "DefaultDirName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "DefaultGroupName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BaseFilename": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "UninstallFilesDir": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "UninstallDisplayName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "UninstallDisplayIcon": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppMutex": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "DefaultUserInfoName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "DefaultUserInfoOrg": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "DefaultUserInfoSerial": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppReadmeFile": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppContact": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppComments": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppModifyPath": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "CreateUninstallRegKey": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Uninstallable": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "CloseApplicationsFilter": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "LicenseText": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "InfoBeforeText": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "InfoAfterText": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "CompiledCodeText": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "LeadBytes": {
+                    "subtype": {
+                        "type": "ansichar",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 32
+                },
+                "NumLanguageEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumCustomMessageEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumPermissionEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumTypeEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumComponentEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumTaskEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumDirEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumFileEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumFileLocationEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumIconEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumIniEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumRegistryEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumInstallDeleteEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumUninstallDeleteEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumRunEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "NumUninstallRunEntries": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "BackColor": {
+                    "type": "longint",
+                    "size": 4
+                },
+                "BackColor2": {
+                    "type": "longint",
+                    "size": 4
+                },
+                "WizardImageBackColor": {
+                    "type": "longint",
+                    "size": 4
+                },
+                "PasswordHash": {
+                    "type": "TSHA1Digest",
+                    "size": null
+                },
+                "PasswordSalt": {
+                    "count": 8,
+                    "subtype": {
+                        "type": "byte",
+                        "size": 1
+                    },
+                    "type": "array",
+                    "size": 8
+                },
+                "ExtraDiskSpaceRequired": {
+                    "type": "integer64",
+                    "size": 8
+                },
+                "SlicesPerDisk": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "UninstallLogMode": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "DirExistsWarning": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "PrivilegesRequired": {
+                    "count": 4,
+                    "type": "enum",
+                    "size": 1
+                },
+                "ShowLanguageDialog": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "LanguageDetectionMethod": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "CompressMethod": {
+                    "count": 5,
+                    "type": "enum",
+                    "size": 1
+                },
+                "ArchitecturesAllowed": {
+                    "subtype": {
+                        "count": 4,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                },
+                "ArchitecturesInstallIn64BitMode": {
+                    "subtype": {
+                        "count": 4,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                },
+                "DisableDirPage": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "DisableProgramGroupPage": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "UninstallDisplaySize": {
+                    "type": "integer64",
+                    "size": 8
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 47,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 6
+                }
+            },
+            "type": "record",
+            "size": 296
+        },
+        "TSetupDisablePage": {
+            "count": 3,
+            "type": "enum",
+            "size": 1
+        },
+        "SetupRegistryEntryAnsiStrings": {
+            "value": 0
+        },
+        "UninstallerMsgTailID": {
+            "value": "$67734D49"
+        },
+        "SetupTaskEntryAnsiStrings": {
+            "value": 0
+        },
+        "TMessagesLangOptions": {
+            "fields": {
+                "ID": {
+                    "count": 8,
+                    "subtype": {
+                        "type": "ansichar",
+                        "size": 1
+                    },
+                    "type": "array",
+                    "value": "!mlo!001",
+                    "size": 8
+                },
+                "DialogFontName": {
+                    "count": 32,
+                    "subtype": {
+                        "type": "char",
+                        "size": 1
+                    },
+                    "type": "array",
+                    "size": 32
+                },
+                "DialogFontSize": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "Flags": {
+                    "subtype": {
+                        "count": 1,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 45
+        },
+        "SetupTitle": {
+            "value": "Inno Setup"
+        },
+        "TSetupID": {
+            "count": 64,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "Inno Setup Setup Data (5.5.0)",
+            "size": 64
+        },
+        "SetupIconEntryStrings": {
+            "value": 13
+        },
+        "TSetupRunEntry": {
+            "fields": {
+                "Name": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Parameters": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "WorkingDir": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "RunOnceId": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "StatusMsg": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Verb": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Description": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Tasks": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AfterInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BeforeInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "ShowCmd": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "Wait": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 10,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 2
+                }
+            },
+            "type": "record",
+            "size": 79
+        },
+        "TGrantPermissionSid": {
+            "fields": {
+                "Authority": {
+                    "type": "TSIDIdentifierAuthority",
+                    "size": null
+                },
+                "SubAuthCount": {
+                    "type": "byte",
+                    "size": 1
+                },
+                "SubAuth": {
+                    "count": 2,
+                    "subtype": {
+                        "type": "dword",
+                        "size": 4
+                    },
+                    "type": "array",
+                    "size": 8
+                }
+            },
+            "type": "record",
+            "size": 9
+        },
+        "SetupLanguageEntryStrings": {
+            "value": 6
+        },
+        "SetupLdrOffsetTableVersion": {
+            "value": 1
+        },
+        "SetupExeModeRegSvr": {
+            "value": "$53526E49"
+        },
+        "TSetupLanguageEntry": {
+            "fields": {
+                "Name": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "LanguageName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "DialogFontName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "TitleFontName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "WelcomeFontName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "CopyrightFontName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Data": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "LicenseText": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "InfoBeforeText": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "InfoAfterText": {
+                    "type": "ansistring",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "LanguageID": {
+                    "type": "cardinal",
+                    "size": 4
+                },
+                "LanguageCodePage": {
+                    "type": "cardinal",
+                    "size": 4
+                },
+                "DialogFontSize": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "TitleFontSize": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "WelcomeFontSize": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "CopyrightFontSize": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "RightToLeft": {
+                    "type": "boolean",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 65
+        },
+        "MessagesLangOptionsID": {
+            "count": 8,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "!mlo!001",
+            "size": 8
+        },
+        "TSetupProcessorArchitectures": {
+            "subtype": {
+                "count": 4,
+                "type": "enum",
+                "size": 1
+            },
+            "type": "set",
+            "size": 1
+        },
+        "TDiskSliceID": {
+            "count": 8,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "idska32#26",
+            "size": 8
+        },
+        "MessagesHdrID": {
+            "count": 64,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "Inno Setup Messages (5.5.0)",
+            "size": 64
+        },
+        "SetupHeaderStrings": {
+            "value": 27
+        },
+        "TMessagesHdrID": {
+            "count": 64,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "Inno Setup Messages (5.5.0)",
+            "size": 64
+        },
+        "TMessagesHeader": {
+            "fields": {
+                "NumMessages": {
+                    "type": "cardinal",
+                    "size": 4
+                },
+                "TotalSize": {
+                    "type": "cardinal",
+                    "size": 4
+                },
+                "NotTotalSize": {
+                    "type": "cardinal",
+                    "size": 4
+                },
+                "CRCMessages": {
+                    "type": "longint",
+                    "size": 4
+                }
+            },
+            "type": "record",
+            "size": 16
+        },
+        "SetupComponentEntryAnsiStrings": {
+            "value": 0
+        },
+        "TSetupIniEntry": {
+            "fields": {
+                "Filename": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Section": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Entry": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Value": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Tasks": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AfterInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BeforeInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 5,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 61
+        },
+        "SetupDeleteEntryStrings": {
+            "value": 7
+        },
+        "TCompID": {
+            "count": 4,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "zlb#26",
+            "size": 4
+        },
+        "TSetupDirEntry": {
+            "fields": {
+                "DirName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Tasks": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AfterInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BeforeInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Attribs": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "PermissionsEntry": {
+                    "type": "smallint",
+                    "size": 2
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 5,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 55
+        },
+        "TSetupVersionDataVersion": {
+            "fields": {
+                "Build": {
+                    "type": "word",
+                    "size": 2
+                },
+                "Minor": {
+                    "type": "byte",
+                    "size": 1
+                },
+                "Major": {
+                    "type": "byte",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 4
+        },
+        "SetupPermissionEntryStrings": {
+            "value": 0
+        },
+        "SetupTypeEntryAnsiStrings": {
+            "value": 0
+        },
+        "TSetupFileEntry": {
+            "fields": {
+                "SourceFilename": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "DestName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "InstallFontName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "StrongAssemblyName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Tasks": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AfterInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BeforeInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "LocationEntry": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "Attribs": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "ExternalSize": {
+                    "type": "integer64",
+                    "size": 8
+                },
+                "PermissionsEntry": {
+                    "type": "smallint",
+                    "size": 2
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 32,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 5
+                },
+                "FileType": {
+                    "count": 2,
+                    "type": "enum",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 84
+        },
+        "SetupDirEntryStrings": {
+            "value": 7
+        },
+        "TSetupVersionData": {
+            "fields": {
+                "WinVersion": {
+                    "type": "cardinal",
+                    "size": 4
+                },
+                "NTVersion": {
+                    "type": "cardinal",
+                    "size": 4
+                },
+                "NTServicePack": {
+                    "type": "word",
+                    "size": 2
+                }
+            },
+            "type": "record",
+            "size": 10
+        },
+        "SetupVersion": {
+            "value": "5.5.0 (a)"
+        },
+        "TDiskSliceHeader": {
+            "fields": {
+                "TotalSize": {
+                    "type": "cardinal",
+                    "size": 4
+                }
+            },
+            "type": "record",
+            "size": 4
+        },
+        "TSetupRegistryEntry": {
+            "fields": {
+                "Subkey": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "ValueName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "ValueData": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Tasks": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AfterInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BeforeInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "RootKey": {
+                    "type": "HKEY",
+                    "size": null
+                },
+                "PermissionsEntry": {
+                    "type": "smallint",
+                    "size": 2
+                },
+                "Typ": {
+                    "count": 7,
+                    "type": "enum",
+                    "size": 1
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 12,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 2
+                }
+            },
+            "type": "record",
+            "size": 61
+        },
+        "SetupLdrOffsetTableResID": {
+            "value": 11111
+        },
+        "TSetupTaskEntry": {
+            "fields": {
+                "Name": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Description": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "GroupDescription": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Level": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "Used": {
+                    "type": "boolean",
+                    "size": 1
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 5,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 50
+        },
+        "TSetupCompressMethod": {
+            "count": 5,
+            "type": "enum",
+            "size": 1
+        },
+        "TSetupDeleteEntry": {
+            "fields": {
+                "Name": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Tasks": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AfterInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BeforeInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "DeleteType": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 49
+        },
+        "SetupRunEntryAnsiStrings": {
+            "value": 0
+        },
+        "SetupFileLocationEntryAnsiStrings": {
+            "value": 0
+        },
+        "TSetupLdrOffsetTable": {
+            "fields": {
+                "ID": {
+                    "count": 12,
+                    "subtype": {
+                        "type": "ansichar",
+                        "size": 1
+                    },
+                    "type": "array",
+                    "size": 12
+                },
+                "Version": {
+                    "type": "longword",
+                    "size": 4
+                },
+                "TotalSize": {
+                    "type": "longword",
+                    "size": 4
+                },
+                "OffsetEXE": {
+                    "type": "longword",
+                    "size": 4
+                },
+                "UncompressedSizeEXE": {
+                    "type": "longword",
+                    "size": 4
+                },
+                "CRCEXE": {
+                    "type": "longint",
+                    "size": 4
+                },
+                "Offset0": {
+                    "type": "longword",
+                    "size": 4
+                },
+                "Offset1": {
+                    "type": "longword",
+                    "size": 4
+                },
+                "TableCRC": {
+                    "type": "longint",
+                    "size": 4
+                }
+            },
+            "type": "record",
+            "size": 44
+        },
+        "TSetupDeleteType": {
+            "count": 3,
+            "type": "enum",
+            "size": 1
+        },
+        "SetupDeleteEntryAnsiStrings": {
+            "value": 0
+        },
+        "SetupPermissionEntryAnsiStrings": {
+            "value": 1
+        },
+        "MaxGrantPermissionEntries": {
+            "value": 32
+        },
+        "TUninstallLogID": {
+            "count": 64,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "size": 64
+        },
+        "UninstallLogID": {
+            "count": 2,
+            "subtype": {
+                "count": 64,
+                "subtype": {
+                    "type": "ansichar",
+                    "size": 1
+                },
+                "type": "array",
+                "size": 64
+            },
+            "type": "array",
+            "value": [
+                "Inno Setup Uninstall Log (b)",
+                "Inno Setup Uninstall Log (b) 64-bit"
+            ],
+            "size": 128
+        },
+        "SetupCustomMessageEntryStrings": {
+            "value": 2
+        },
+        "TSetupComponentEntry": {
+            "fields": {
+                "Name": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Description": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Types": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "ExtraDiskSpaceRequired": {
+                    "type": "integer64",
+                    "size": 8
+                },
+                "Level": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "Used": {
+                    "type": "boolean",
+                    "size": 1
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 5,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                },
+                "Size": {
+                    "type": "integer64",
+                    "size": 8
+                }
+            },
+            "type": "record",
+            "size": 62
+        },
+        "TSetupSalt": {
+            "count": 8,
+            "subtype": {
+                "type": "byte",
+                "size": 1
+            },
+            "type": "array",
+            "size": 8
+        },
+        "TSetupCustomMessageEntry": {
+            "fields": {
+                "Name": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Value": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "LangIndex": {
+                    "type": "integer",
+                    "size": 4
+                }
+            },
+            "type": "record",
+            "size": 12
+        },
+        "SetupRunEntryStrings": {
+            "value": 13
+        },
+        "TGrantPermissionEntry": {
+            "fields": {
+                "Sid": {
+                    "fields": {
+                        "Authority": {
+                            "type": "TSIDIdentifierAuthority",
+                            "size": null
+                        },
+                        "SubAuthCount": {
+                            "type": "byte",
+                            "size": 1
+                        },
+                        "SubAuth": {
+                            "count": 2,
+                            "subtype": {
+                                "type": "dword",
+                                "size": 4
+                            },
+                            "type": "array",
+                            "size": 8
+                        }
+                    },
+                    "type": "record",
+                    "size": 9
+                },
+                "AccessMask": {
+                    "type": "dword",
+                    "size": 4
+                }
+            },
+            "type": "record",
+            "size": 13
+        },
+        "SetupComponentEntryStrings": {
+            "value": 5
+        },
+        "TSetupTypeOptions": {
+            "subtype": {
+                "count": 1,
+                "type": "enum",
+                "size": 1
+            },
+            "type": "set",
+            "size": 1
+        },
+        "TSetupIconEntry": {
+            "fields": {
+                "IconName": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Filename": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Parameters": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "WorkingDir": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "IconFilename": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Comment": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Components": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Tasks": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Languages": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "Check": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AfterInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "BeforeInstall": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "AppUserModelID": {
+                    "type": "string",
+                    "size": [
+                        4,
+                        1
+                    ]
+                },
+                "MinVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "OnlyBelowVersion": {
+                    "fields": {
+                        "WinVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTVersion": {
+                            "type": "cardinal",
+                            "size": 4
+                        },
+                        "NTServicePack": {
+                            "type": "word",
+                            "size": 2
+                        }
+                    },
+                    "type": "record",
+                    "size": 10
+                },
+                "IconIndex": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "ShowCmd": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "CloseOnExit": {
+                    "count": 3,
+                    "type": "enum",
+                    "size": 1
+                },
+                "HotKey": {
+                    "type": "word",
+                    "size": 2
+                },
+                "Options": {
+                    "subtype": {
+                        "count": 6,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 1
+                }
+            },
+            "type": "record",
+            "size": 84
+        },
+        "SetupExeModeUninstaller": {
+            "value": "$6E556E49"
+        },
+        "SetupHeaderAnsiStrings": {
+            "value": 4
+        },
+        "SetupLanguageEntryAnsiStrings": {
+            "value": 4
+        },
+        "SetupFileEntryAnsiStrings": {
+            "value": 0
+        },
+        "SetupLdrOffsetTableID": {
+            "value": "rDlPtS#$CD#$E6#$D7#$7B#$0B#$2A"
+        },
+        "TSetupIconCloseOnExit": {
+            "count": 3,
+            "type": "enum",
+            "size": 1
+        },
+        "SetupCustomMessageEntryAnsiStrings": {
+            "value": 0
+        },
+        "TSetupFileLocationEntry": {
+            "fields": {
+                "FirstSlice": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "LastSlice": {
+                    "type": "integer",
+                    "size": 4
+                },
+                "StartOffset": {
+                    "type": "longint",
+                    "size": 4
+                },
+                "ChunkSuboffset": {
+                    "type": "integer64",
+                    "size": 8
+                },
+                "OriginalSize": {
+                    "type": "integer64",
+                    "size": 8
+                },
+                "ChunkCompressedSize": {
+                    "type": "integer64",
+                    "size": 8
+                },
+                "SHA1Sum": {
+                    "type": "TSHA1Digest",
+                    "size": null
+                },
+                "TimeStamp": {
+                    "type": "TFileTime",
+                    "size": null
+                },
+                "FileVersionMS": {
+                    "type": "dword",
+                    "size": 4
+                },
+                "FileVersionLS": {
+                    "type": "dword",
+                    "size": 4
+                },
+                "Flags": {
+                    "subtype": {
+                        "count": 9,
+                        "type": "enum",
+                        "size": 1
+                    },
+                    "type": "set",
+                    "size": 2
+                }
+            },
+            "type": "record",
+            "size": 46
+        },
+        "TSetupTypeType": {
+            "count": 4,
+            "type": "enum",
+            "size": 1
+        },
+        "SetupID": {
+            "count": 64,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "Inno Setup Setup Data (5.5.0)",
+            "size": 64
+        },
+        "TSetupTypeOption": {
+            "count": 1,
+            "type": "enum",
+            "size": 1
+        },
+        "SetupIniEntryAnsiStrings": {
+            "value": 0
+        },
+        "SetupFileLocationEntryStrings": {
+            "value": 0
+        },
+        "DiskSliceID": {
+            "count": 8,
+            "subtype": {
+                "type": "ansichar",
+                "size": 1
+            },
+            "type": "array",
+            "value": "idska32#26",
+            "size": 8
+        }
+    }
+}
