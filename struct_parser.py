@@ -233,11 +233,9 @@ class StructFormatter(object):
             v = []
             for item in e:
                 v.append(self._format_values(item))
-        elif 'int_num' in e:
-            v = int(e['int_num'])
-        elif 'hex_num' in e:
-            v = e['hex_num']
-        elif 'quoted_string' in e or 'control_string' in e:
+        if 'expression' in e:
+            v = self._format_values(e['expression'])
+        if 'quoted_string' in e or 'control_string' in e:
             v = ''
             for k,s in e.items():
                 if '_string' not in k:
@@ -245,11 +243,56 @@ class StructFormatter(object):
                 if not isinstance(s, list):
                     s = [s]
                 unquote = (lambda s: s[1:-1]) if k == 'quoted_string' else (lambda s: s)
-                v += str.join('', map(unquote, s))
-        else:
+                v += str.join('', map(unquote, s)) # assumes string concatenation
+        elif 'add_op' in e or 'mul_op' in e:
+            v = self._reduce_values(e, v)
+        elif 'int_num' in e:
+            v = int(e['int_num'])
+        elif 'hex_num' in e:
+            v = e['hex_num']
+        elif v is None:
             sys.stderr.write('could not format const: %s\n' % const_expression)
         return v
 
+    def _reduce_values(self, const_expression, current_value):
+        e = const_expression
+        v = current_value
+        if v:
+            # assumptions here:
+            # - `e[0]` is an expression
+            # - `e[1]` is an operator
+            # - `e[2]` is an operand
+            # - `v` is output of `e[0]` expression
+            # - `v` is same type as `e[2]`
+            operators, operands = e.items()[1:]
+            if not isinstance(v, list):
+                v = [v]
+        else:
+            operands, operators = e.items()
+        operand_type, operands = operands
+        operator_type, operators = operators
+        if not isinstance(operands, list):
+            operands = [operands]
+        if not isinstance(operators, list):
+            operators = [operators]
+        if v:
+            operands = v + operands
+        if operand_type == 'int_num':
+            operands = map(int, operands)
+        else:
+            sys.stderr.write('unprocessed operand type: %s\n' % operand_type)
+        if operator_type in ['mul_op', 'add_op']:
+            v = operands[0]
+            for i,o in zip(operands[1:], operators):
+                if o == 'shl':
+                    v = v << i
+                elif o == '+':
+                    v += i
+                else:
+                    sys.stderr.write('uhandled operation: %s %s %s\n' % (v, o, i))
+        else:
+            sys.stderr.write('uprocessed operation type: %s\n' % operator_type)
+        return v
 
     def format(self):
         for ts in self.pyast_dict['unit_interface']['type_section']:
