@@ -120,14 +120,14 @@ class StructFormatter(object):
         'real': 4, 'single': 4,
         'double': 8, 'extended': 10,
         # string types
-        'char': 1, 'widechar': 2,
+        'char': 1, 'ansichar': 1, 'widechar': 2,
         'string': [4, 1], # has an integer header that stores its length
         'ansistring': [4, 1], 'widestring': [4, 2],
     }
 
     type_values = {
         'boolean': 2,
-        'byte': 256, 'char': 256,
+        'byte': 256, 'char': 256, 'ansichar': 256,
         'word': 65536,
     }
 
