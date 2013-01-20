@@ -240,6 +240,8 @@ class StructFormatter(object):
         elif 'quoted_string' in e or 'control_string' in e:
             v = ''
             for k,s in e.items():
+                if '_string' not in k:
+                    continue
                 if not isinstance(s, list):
                     s = [s]
                 unquote = (lambda s: s[1:-1]) if k == 'quoted_string' else (lambda s: s)
