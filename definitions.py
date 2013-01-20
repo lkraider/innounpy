@@ -82,8 +82,9 @@ class StructParser(object):
 
 def parser_for_version(version):
     import os
-    major, minor, release = map(int, version.split('.'))
-    filepath = 'structs/Struct%d%d%02d.pas' % (major, minor, release)
+    major, minor, release = map(int, version.replace('u', '').split('.'))
+    is_unicode = 'u' if version[-1] == 'u' else ''
+    filepath = 'structs/Struct%d%d%02d%s.pas' % (major, minor, release, is_unicode)
     if not os.path.isfile(filepath):
         raise IOError('File not found: %s' % filepath)
     return StructParser(filepath)

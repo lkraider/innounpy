@@ -61,7 +61,7 @@ class InnoUnpacker(object):
     @cached_property
     def struct_constants(self):
         """Dictionary of parsed data from matching version Struct.pas file"""
-        version = self.TSetupID.split('(')[-1].split(')')[0]
+        version = self.TSetupID.partition('(')[-1].rpartition(')')[0].replace(') (', '')
         parser = definitions.parser_for_version(version)
         return dict(parser)
 
