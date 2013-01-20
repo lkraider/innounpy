@@ -2,9 +2,13 @@ import os
 import pefile
 import pylzma
 import struct
-from collections import OrderedDict
 from pprint import pprint
 from functools import wraps
+
+try:
+    from collections import OrderedDict
+except:
+    from ordereddict import OrderedDict
 
 import definitions
 

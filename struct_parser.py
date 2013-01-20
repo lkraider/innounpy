@@ -3,7 +3,11 @@ import sys
 import json
 import pyPEG
 from pyPEG import keyword
-from collections import OrderedDict
+
+try:
+    from collections import OrderedDict
+except:
+    from ordereddict import OrderedDict
 
 
 # A simplified pascal unit grammar, specialized in parsing Inno Setup Struct.pas files
