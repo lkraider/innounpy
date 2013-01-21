@@ -1,3 +1,4 @@
+
 import re
 import sys
 import json
@@ -98,7 +99,7 @@ def pyast_to_json(ast, raw_dump=False):
     if raw_dump:
         return json.dumps(pyast_dict)
     formatter = StructFormatter(pyast_dict)
-    return json.dumps(formatter.format())
+    return json.dumps(formatter.format(), indent=4, separators=(',', ': '))
 
 
 class StructFormatter(object):
@@ -174,6 +175,9 @@ class StructFormatter(object):
         """Return (subtype_dict, size) of set"""
         subtype = self._format_types(set_dict)
         size = subtype.get('count') or self.type_values.get(subtype['type']) - 1
+        # Set size is calculated as such:
+        # (Max div 8) - (Min div 8) + 1
+        # Min is usually 0, and Max the number of elements
         size = (size / 8) + 1
         return subtype, size
 

@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 import os
-import json
 import pefile
 import pylzma
 import struct
 from pprint import pprint
 from utils import cached_property
 
+try:
+    import simplejson as json
+except:
+    import json
 try:
     from collections import OrderedDict
 except:
@@ -277,7 +280,7 @@ def struct_for_version(version):
     filepath = 'structs/Struct%s.json' % version
     if not os.path.isfile(filepath):
         raise IOError('File not found: %s' % filepath)
-    data = json.load(open(filepath))
+    data = json.load(open(filepath), object_pairs_hook=OrderedDict)
     return data['Struct%s' % version]
 
 
