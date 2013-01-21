@@ -1,49 +1,17 @@
 #!/usr/bin/env python
 
 import os
+import json
 import pefile
 import pylzma
 import struct
 from pprint import pprint
-from functools import wraps
+from utils import cached_property
 
 try:
     from collections import OrderedDict
 except:
     from ordereddict import OrderedDict
-
-import definitions
-
-
-def cached_property(func, name=None):
-    """
-    cached_property(func, name=None) -> a descriptor
-    This decorator implements an object's property which is computed
-    the first time it is accessed, and which value is then stored in
-    the object's __dict__ for later use. If the attribute is deleted,
-    the value will be recomputed the next time it is accessed.
-    Usage:
-        class X(object):
-            @cachedProperty
-            def foo(self):
-                return computation()
-    """
-    if name is None:
-        name = func.__name__
-
-    @wraps(func)
-    def _get(self):
-        try:
-            value = self.__dict__[name]
-        except KeyError:
-            value = func(self)
-            self.__dict__[name] = value
-        return value
-
-    def _del(self):
-        self.__dict__.pop(name, None)
-
-    return property(_get, None, _del)
 
 
 class InnoUnpacker(object):
@@ -61,9 +29,7 @@ class InnoUnpacker(object):
     @cached_property
     def struct_constants(self):
         """Dictionary of parsed data from matching version Struct.pas file"""
-        version = self.TSetupID.partition('(')[-1].rpartition(')')[0].replace(') (', '')
-        parser = definitions.parser_for_version(version)
-        return dict(parser)
+        return struct_for_TSetupID(self.TSetupID)
 
     @cached_property
     def TSetupLdrOffsetTable(self):
@@ -295,6 +261,24 @@ class InnoUnpacker(object):
                 o.write(data)
                 data = f.read(buffer_size)
         f.close()
+
+
+# Helper Struct loader functions
+
+def struct_for_TSetupID(TSetupID):
+    version = TSetupID.partition('(')[-1].rpartition(')')[0].replace(') (', '')
+    return struct_for_version(version)
+
+
+def struct_for_version(version):
+    major, minor, release = map(int, version.replace('u', '').split('.'))
+    is_unicode = 'u' if version[-1] == 'u' else ''
+    version = '%d%d%02d%s' % (major, minor, release, is_unicode)
+    filepath = 'structs/Struct%s.json' % version
+    if not os.path.isfile(filepath):
+        raise IOError('File not found: %s' % filepath)
+    data = json.load(open(filepath))
+    return data['Struct%s' % version]
 
 
 if __name__ == '__main__':
