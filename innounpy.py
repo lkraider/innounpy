@@ -113,58 +113,32 @@ class InnoUnpacker(object):
     @cached_property
     def TSetupHeader(self):
         """Table from setup-0 that packs Inno Setup installer options"""
-        TSetupHeader = OrderedDict()
-        LeadBytesSize = 32
-        TSetupVersionDataSize = 10
-        TMD5DigestSize = 16
-        TSetupSaltSize = 8
-        # Set size is calculated as such:
-        # (Max div 8) - (Min div 8) + 1
-        # Min is usually 0, and Max the number of elements
-        OptionsSetSize = (len(self.struct_constants['TSetupHeaderOption']) / 8) + 1
+        TSetupHeader = self.struct_constants['TSetupHeader']
+
+        # size of hash digests
+        hash_sizes = {
+            'TMD5Digest': 16,
+            'TSHA1Digest': 20,
+        }
+        p = TSetupHeader['fields']['PasswordHash']
+        p['size'] = hash_sizes.get(p['type'])
 
         # read setup-0 data
         with self.setup_0_data as f:
-            # read variable length strings
-            keys = self.struct_constants['TSetupHeader_StringsList']
-            values = self._read_strings(f, keys)
-            TSetupHeader.update(zip(keys, values))
-
-            # skip LeadBytes
-            f.seek(LeadBytesSize, os.SEEK_CUR)
-
-            # read packed integers
-            keys = self.struct_constants['TSetupHeader_IntegersList']
-            values = []
-            for i in range(len(keys)):
-                value = struct.unpack('<l', f.read(4))[0]
-                values.append(value)
-            TSetupHeader.update(zip(keys, values))
-
-            # skip MinVersion, OnlyBelowVersion
-            f.seek(TSetupVersionDataSize * 2, os.SEEK_CUR)
-            # skip BackColor, BackColor2, WizardImageBackColor
-            f.seek(4 * 3, os.SEEK_CUR)
-            # skip PasswordHash, PasswordSalt
-            f.seek(TMD5DigestSize + TSetupSaltSize, os.SEEK_CUR)
-            # skip ExtraDiskSpaceRequired, SlicesPerDisk
-            f.seek(8 + 4, os.SEEK_CUR)
-
-            # skip sets UninstallLogMode, DirExistsWarning, PrivilegesRequired
-            f.seek(3 * 1, os.SEEK_CUR)
-            # skip sets ShowLanguageDialog, LanguageDetectionMethod, CompressMethod
-            f.seek(3 * 1, os.SEEK_CUR)
-            # skip sets ArchitecturesAllowed, ArchitecturesInstallIn64BitMode
-            f.seek(2 * 1, os.SEEK_CUR)
-
-            # skip SignedUninstallerOrigSize, SignedUninstallerHdrChecksum
-            f.seek(2 * 4, os.SEEK_CUR)
-            # skip Options Set
-            f.seek(OptionsSetSize, os.SEEK_CUR)
-
-            # store end of TSetupHeader location as its size and offset
-            TSetupHeader['EndOffset'] = TSetupHeader['Size'] = f.tell()
-
+            reading = True
+            for name, field in TSetupHeader['fields'].iteritems():
+                # skip LeadBytes
+                if name == "LeadBytes":
+                    f.seek(field['size'], os.SEEK_CUR)
+                    continue
+                # skip everything from MinVersion onwards
+                if name == "MinVersion":
+                    reading = False
+                if reading:
+                    field['value'] = self._read_field(f, field)
+                else:
+                    f.seek(field['size'], os.SEEK_CUR)
+            TSetupHeader['EndOffset'] = TSetupHeader['size'] = f.tell()
         return TSetupHeader
 
     @cached_property
@@ -237,6 +211,33 @@ class InnoUnpacker(object):
         pprint(self.CustomMessagesEntries.items())
 
     # Helper functions
+    def _read_field(self, fileobj, field):
+        if 'string' in field['type']:
+            return self._read_string(fileobj, field['size'])
+        if 'integer' in field['type']:
+            return self._read_integer(fileobj, field['size'])
+
+    def _read_string(self, fileobj, string_size=(4,1)):
+        """
+        Read string from fileobj's current position.
+        `string_size` - tuple of string header size and single char size
+        """
+        f = fileobj
+        assert(string_size[0] == 4)
+        string_length = struct.unpack('<l', f.read(4))[0]
+        if self.debug and string_length > 512:
+            # skip long data strings in debug mode
+            value = 'BIGSTRING OFFSET:%s LENGTH:%s' % (f.tell(), string_length)
+            f.seek(string_length, os.SEEK_CUR)
+        else:
+            value = f.read(string_length)
+        return value
+
+    def _read_integer(self, fileobj, size):
+        s = 'q' if size == 8 else 'l'
+        return struct.unpack('<%s' % s, fileobj.read(size))[0]
+
+
     def _read_strings(self, fileobj, keys):
         """Read len(keys) number of strings from fileobj's current position"""
         f = fileobj
