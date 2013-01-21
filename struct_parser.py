@@ -111,7 +111,7 @@ class StructFormatter(object):
 
     def __init__(self, pyast_dict):
         self.pyast_dict = pyast_dict
-        self._output = {}
+        self._output = OrderedDict()
 
     # size definitions
     type_sizes = {
